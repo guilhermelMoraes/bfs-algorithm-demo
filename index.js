@@ -103,21 +103,21 @@ class Game {
     return validSqrs;
   }
 
-  #propagateWeight(sqr, weight = 0) {
-    const adjacentSqrs = this.#getValidAdjacentSquares(sqr);
+  #propagateWeight(refSquare) {
+    const queue = [{ square: refSquare, distance: 0 }];
+    
+    while (queue.length > 0) {
+      const { square, distance } = queue.shift();
 
-    if (adjacentSqrs.length === 0) {
-      return;
+      const adjacentSqrs = this.#getValidAdjacentSquares(square);
+
+      adjacentSqrs.forEach(({ square: adjSqr }) => {
+        adjSqr.dataset.weight = distance + 1;
+        adjSqr.innerHTML = distance + 1;
+
+        queue.push({ square: adjSqr, distance: distance + 1 });
+      });
     }
-
-    adjacentSqrs.forEach(({ square }) => {
-      square.dataset.weight = weight + 1;
-      square.innerHTML = weight + 1;
-    });
-
-    adjacentSqrs.forEach(({ square }) => {
-      this.#propagateWeight(square, weight + 1);
-    });
   }
 
   #clearBoard() {
