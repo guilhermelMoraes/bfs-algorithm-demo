@@ -3,7 +3,7 @@ class Game {
   #markedSquare = null;
   #squareProps = [
     [
-      { weight: null, enabled: false, index: null },
+      { weight: null, enabled: false, index: 0 },
       { weight: null, enabled: false, index: 1 },
       { weight: null, enabled: false, index: 2 },
       { weight: null, enabled: false, index: 3 },
@@ -29,7 +29,7 @@ class Game {
       { weight: null, enabled: false, index: 19 },
       { weight: null, enabled: false, index: 20 },
       { weight: null, enabled: false, index: 21 },
-      { weight: null, enabled: true, index: null },
+      { weight: null, enabled: true, index: 22 },
       { weight: null, enabled: false, index: 23 },
     ],
     [
@@ -83,17 +83,17 @@ class Game {
       { weight: null, enabled: false, index: 63 },
     ],
   ];
-  
+
   #getValidAdjacentSquares(refSquare) {
     const refId = parseInt(refSquare.id.split('-').at(1));
     
     const getNextById = (id) => document.querySelector(`#square-${id}.square--enabled`);
 
     const adjacent = [
-      { name: 'top', square: getNextById(refId - 8) },
-      { name: 'right', square: getNextById(refId + 1) },
-      { name: 'bottom', square: getNextById(refId + 8) },
       { name: 'left', square: getNextById(refId - 1) },
+      { name: 'top', square: getNextById(refId - 8) },
+      { name: 'bottom', square: getNextById(refId + 8) },
+      { name: 'right', square: getNextById(refId + 1) },
     ];
     
     const validSqrs = adjacent.filter(
@@ -102,17 +102,31 @@ class Game {
 
     return validSqrs;
   }
-  
+
   #propagateWeight(sqr, weight = 0) {
-    debugger
     const adjacentSqrs = this.#getValidAdjacentSquares(sqr);
 
+    if (adjacentSqrs.length === 0) {
+      return;
+    }
+
     adjacentSqrs.forEach(({ square }) => {
-      square.dataset.weight = weight;
+      square.dataset.weight = weight + 1;
+      square.innerHTML = weight + 1;
+    });
+
+    adjacentSqrs.forEach(({ square }) => {
       this.#propagateWeight(square, weight + 1);
     });
   }
 
+  #clearBoard() {
+    const squares = document.querySelectorAll('.square--enabled');
+    squares.forEach((el) => {
+      el.dataset.weight = null;
+      el.innerHTML = '';
+    });
+  }
 
   #markDestination(event) {
     const prevMarkedSqr = this.#markedSquare;
@@ -121,10 +135,12 @@ class Game {
       prevMarkedSqr.dataset.weight = null;
     }
     
+    this.#clearBoard();
     const square = event.currentTarget;
     square.classList.add('square--selected');
     this.#markedSquare = square;
     square.dataset.weight = 0;
+    square.innerHTML = 0;
     
     this.#propagateWeight(square);
   }
