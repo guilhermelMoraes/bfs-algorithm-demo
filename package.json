@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "BFS algorithm demonstration using a simple maze game.",
   "main": "index.js",
+  "scripts": {
+    "start": "serve ."
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/guilhermelMoraes/bfs-algorithm-demo.git"
@@ -20,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/guilhermelMoraes/bfs-algorithm-demo/issues"
   },
-  "homepage": "https://github.com/guilhermelMoraes/bfs-algorithm-demo#readme"
+  "homepage": "https://github.com/guilhermelMoraes/bfs-algorithm-demo#readme",
+  "devDependencies": {
+    "serve": "^14.2.5"
+  }
 }
