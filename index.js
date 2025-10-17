@@ -1,6 +1,7 @@
 class Game {
   #board = document.getElementById('board');
-  #markedSquare = null;
+  #destinationSquare = null;
+  #sprite;
   #squareProps = [
     [
       { weight: null, enabled: false, index: 0 },
@@ -83,22 +84,56 @@ class Game {
       { weight: null, enabled: false, index: 63 },
     ],
   ];
+  #movementInterval = null;
+  #movementAudio = new Audio('./movement-sound.mp3');
 
-  #getValidAdjacentSquares(refSquare) {
-    const refId = parseInt(refSquare.id.split('-').at(1));
+  constructor() {
+    const loadSprite = () => {
+      const sprite = document.createElement('img');
+      sprite.src = './sprite.png';
+      sprite.alt = 'Sprite';
+      sprite.id = 'sprite';
+  
+      this.#sprite = sprite;
+    }
+
+    const loadAudio = () => {
+      this.#movementAudio.preload = 'auto';
+      this.#movementAudio.volume = 1;
+    }
+
+
+    loadAudio();
+    loadSprite();
+  }
+
+  #playMovementAudio() {
+    this.#movementAudio.currentTime = 0;
+
+    this.#movementAudio
+      .play()
+      .catch(console.error);
+  }
+
+  #getValidAdjacentSquares(refSquare, getWeightedAdjs = false) {
+    const refId = Number.parseInt(refSquare.id.split('-').at(1));
     
     const getNextById = (id) => document.querySelector(`#square-${id}.square--enabled`);
 
     const adjacent = [
       { name: 'left', square: getNextById(refId - 1) },
-      { name: 'top', square: getNextById(refId - 8) },
-      { name: 'bottom', square: getNextById(refId + 8) },
+      { name: 'top', square: getNextById(refId - this.#squareProps.length) },
+      { name: 'bottom', square: getNextById(refId + this.#squareProps.length) },
       { name: 'right', square: getNextById(refId + 1) },
     ];
     
-    const validSqrs = adjacent.filter(
-      ({ square }) => square !== null && square?.dataset?.weight === 'null',
-    );
+    const validSqrs = adjacent.filter(({ square }) => {
+      if (getWeightedAdjs) {
+        return square !== null && square?.dataset?.weight !== null
+      } else {
+        return square !== null && square?.dataset?.weight === 'null'
+      }
+    });
 
     return validSqrs;
   }
@@ -113,7 +148,6 @@ class Game {
 
       adjacentSqrs.forEach(({ square: adjSqr }) => {
         adjSqr.dataset.weight = distance + 1;
-        adjSqr.innerHTML = distance + 1;
 
         queue.push({ square: adjSqr, distance: distance + 1 });
       });
@@ -124,25 +158,55 @@ class Game {
     const squares = document.querySelectorAll('.square--enabled');
     squares.forEach((el) => {
       el.dataset.weight = null;
-      el.innerHTML = '';
     });
   }
 
-  #markDestination(event) {
-    const prevMarkedSqr = this.#markedSquare;
-    if (prevMarkedSqr) {
-      prevMarkedSqr.classList.remove('square--selected');
-      prevMarkedSqr.dataset.weight = null;
+  #moveSprite() {
+    const halfSecond = 500;
+
+    if (this.#movementInterval) {
+      clearInterval(this.#movementInterval);
+    }
+
+    this.#movementInterval = setInterval(() => {
+      const adjacent = this.#getValidAdjacentSquares(this.#sprite.parentElement, true);
+    
+      const currentPos = this.#sprite.parentElement;
+      let moved = false;
+
+      adjacent.forEach(({ square }) => {
+        if (Number.parseInt(square.dataset.weight) < Number.parseInt(currentPos.dataset.weight)) {
+          square.appendChild(this.#sprite);
+          moved = true;
+        }
+      });
+
+      if (moved) {
+        this.#playMovementAudio();
+      }
+
+      if (this.#sprite.parentElement === this.#destinationSquare) {
+        clearInterval(this.#movementInterval);
+        this.#movementInterval = null;
+      }
+    }, halfSecond);
+  }
+
+  markDestination(event) {
+    const prevDestinationSqr = this.#destinationSquare;
+    if (prevDestinationSqr) {
+      prevDestinationSqr.classList.remove('square--selected');
+      prevDestinationSqr.dataset.weight = null;
     }
     
     this.#clearBoard();
     const square = event.currentTarget;
     square.classList.add('square--selected');
-    this.#markedSquare = square;
+    this.#destinationSquare = square;
     square.dataset.weight = 0;
-    square.innerHTML = 0;
     
     this.#propagateWeight(square);
+    this.#moveSprite();
   }
   
   #createBoard() {
@@ -155,16 +219,23 @@ class Game {
         
         if (enabled) {
           square.classList.add('square--enabled');
-          square.addEventListener('click', this.#markDestination.bind(this));
+          square.addEventListener('click', this.markDestination.bind(this));
         }
         
         this.#board.appendChild(square);
       });
     });
   }
-  
+
+  #getSquareById(index) {
+    return document.getElementById(`square-${index}`);
+  }
+
   start() {
     this.#createBoard();
+    
+    const initialSpritePos = this.#getSquareById(27);
+    initialSpritePos.appendChild(this.#sprite);
   }
 }
 
