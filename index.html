@@ -7,20 +7,36 @@
   <title>Breadth First Search algorithm demo</title>
 </head>
 <body>
-  <div id="container">
-    <header>
-      <h1>Maze</h1>
-      <p>
-        Developed out of curiosity. The Breadth First Search algorithm I learned on Khan Academy algorithm course.
-      </p>
-
+  <header>
+    <h1>
+      Breadth First Search algorithm demonstration
+    </h1>
+  </header>
+  <div id="content">
+    <section class="grid-item">
       <h2>Click anywhere to start</h2>
-    </header>
-    <main id="board"></main>
-    <footer>
-      Developed by <a href="https://www.linkedin.com/in/guilhermelmoraes/?locale=en_US" target="_blank" rel="noopener noreferrer">Guilherme Moraes</a>
-    </footer>
+      <main id="board"></main>
+    </section>
+    <section class="grid-item">
+      <div>
+        <h2>Adjustments</h2>
+        <form>
+          <button type="button">
+            Restart
+          </button>
+          <label class="form-group" for="show-borders">
+            <input id="show-borders" type="checkbox" checked>
+            <span>Show borders</span>
+          </label>
+          <label class="form-group" for="show-weight">
+            <input id="show-weight" type="checkbox" checked>
+            <span>Show weight</span>
+          </label>
+        </form>
+      </div>
+    </section>
   </div>
-  <script src="index.js"></script>
+  <script type="module" src="./boards.js"></script>
+  <script type="module" src="index.js"></script>
 </body>
 </html>
