@@ -1,9 +1,38 @@
+* {
+  user-select: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, a, button, span {
+  font-size: 18px;
+}
+
 body {
   background-color: #c4c4c4;
   margin: 16px 0 0 0;
+}
 
-  font-size: 18px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+a {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #000;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 8px 32px;
 }
 
 h1, h2 {
@@ -23,10 +52,15 @@ input {
 }
 
 #content {
-  border: 1px solid red;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 32px;
+  margin: 0 32px;
+}
+
+#description {
+  max-width: 512px;
 }
 
 #board {
@@ -61,10 +95,6 @@ input {
 .square--enabled {
   background-color: #fff;
 }
-/* 
-.square--enabled::after {
-  content: attr(data-weight);
-} */
 
 .square--show-weight::after {
   content: attr(data-weight);

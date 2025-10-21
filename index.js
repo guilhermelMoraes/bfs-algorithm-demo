@@ -93,7 +93,7 @@ class BreadthFirstSearchAlgorithmDemo {
     }, halfSecond);
   }
   
-  markDestination(event) {
+  #markDestination(event) {
     const prevDestinationSqr = this.#destinationSquare;
     if (prevDestinationSqr) {
       prevDestinationSqr.classList.remove('square--selected');
@@ -122,7 +122,7 @@ class BreadthFirstSearchAlgorithmDemo {
         if (enabled) {
           square.dataset.weight = '';
           square.classList.add('square--enabled', 'square--show-weight');
-          square.addEventListener('click', this.markDestination.bind(this));
+          square.addEventListener('click', this.#markDestination.bind(this));
         }
         
         this.#board.appendChild(square);

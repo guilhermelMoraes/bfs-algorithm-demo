@@ -170,7 +170,7 @@ const boards = {
       { enabled: false, index: 72 },
       { enabled: false, index: 73 },
       { enabled: false, index: 74 },
-      { enabled: false, index: 75 },
+      { enabled: true, index: 75 },
       { enabled: false, index: 76 },
       { enabled: true, index: 77 },
       { enabled: false, index: 78 },
