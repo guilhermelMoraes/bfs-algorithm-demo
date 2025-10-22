@@ -3,11 +3,11 @@ const boardsModule = await import('./boards.js');
 boards = boardsModule.default;
 
 class BreadthFirstSearchAlgorithmDemo {
-  #board = document.getElementById('board');
-  #destinationSquare = null;
   #ghost;
+  #destinationCell = null;
   #movementInterval = null;
-  #squareProps = boards['12x12'];
+  #cellProps = boards['12x12'];
+  #board = document.getElementById('board');
   
   constructor() {
     const loadGhost = () => {
@@ -22,48 +22,48 @@ class BreadthFirstSearchAlgorithmDemo {
     loadGhost();
   }
   
-  #getValidAdjacentSquares(refSquare, getWeightedAdjs = false) {
-    const refId = Number.parseInt(refSquare.id.split('-').at(1));
+  #getValidAdjacentCells(refCell, getWeightedAdj = false) {
+    const refId = Number.parseInt(refCell.id.split('-').at(1));
     
-    const getNextById = (id) => document.querySelector(`#square-${id}.square--enabled`);
+    const getNextById = (id) => document.querySelector(`#cell-${id}.cell--enabled`);
     
     const adjacent = [
-      { name: 'left', square: getNextById(refId - 1) },
-      { name: 'top', square: getNextById(refId - this.#squareProps.length) },
-      { name: 'bottom', square: getNextById(refId + this.#squareProps.length) },
-      { name: 'right', square: getNextById(refId + 1) },
+      { name: 'left', cell: getNextById(refId - 1) },
+      { name: 'top', cell: getNextById(refId - this.#cellProps.length) },
+      { name: 'bottom', cell: getNextById(refId + this.#cellProps.length) },
+      { name: 'right', cell: getNextById(refId + 1) },
     ];
     
-    const validSqrs = adjacent.filter(({ square }) => {
-      if (getWeightedAdjs) {
-        return square !== null && square?.dataset?.weight !== null
+    const validSqrs = adjacent.filter(({ cell }) => {
+      if (getWeightedAdj) {
+        return cell !== null && cell?.dataset?.weight !== null
       } else {
-        return square !== null && square?.dataset?.weight === 'null'
+        return cell !== null && cell?.dataset?.weight === 'null'
       }
     });
     
     return validSqrs;
   }
   
-  #propagateWeight(refSquare) {
-    const queue = [{ square: refSquare, distance: 0 }];
+  #propagateWeight(refCell) {
+    const queue = [{ cell: refCell, distance: 0 }];
 
     while (queue.length > 0) {
-      const { square, distance } = queue.shift();
+      const { cell, distance } = queue.shift();
       
-      const adjacentSqrs = this.#getValidAdjacentSquares(square);
+      const adjacentCells = this.#getValidAdjacentCells(cell);
       
-      adjacentSqrs.forEach(({ square: adjSqr }) => {
+      adjacentCells.forEach(({ cell: adjSqr }) => {
         adjSqr.dataset.weight = distance + 1;
         
-        queue.push({ square: adjSqr, distance: distance + 1 });
+        queue.push({ cell: adjSqr, distance: distance + 1 });
       });
     }
   }
   
   #clearBoard() {
-    const squares = document.querySelectorAll('.square--enabled');
-    squares.forEach((el) => {
+    const cells = document.querySelectorAll('.cell--enabled');
+    cells.forEach((el) => {
       el.dataset.weight = null;
     });
   }
@@ -76,17 +76,17 @@ class BreadthFirstSearchAlgorithmDemo {
     }
     
     this.#movementInterval = setInterval(() => {
-      const adjacent = this.#getValidAdjacentSquares(this.#ghost.parentElement, true);
+      const adjacent = this.#getValidAdjacentCells(this.#ghost.parentElement, true);
       
       const currentPos = this.#ghost.parentElement;
       
-      adjacent.forEach(({ square }) => {
-        if (Number.parseInt(square.dataset.weight) < Number.parseInt(currentPos.dataset.weight)) {
-          square.appendChild(this.#ghost);
+      adjacent.forEach(({ cell }) => {
+        if (Number.parseInt(cell.dataset.weight) < Number.parseInt(currentPos.dataset.weight)) {
+          cell.appendChild(this.#ghost);
         }
       });
       
-      if (this.#ghost.parentElement === this.#destinationSquare) {
+      if (this.#ghost.parentElement === this.#destinationCell) {
         clearInterval(this.#movementInterval);
         this.#movementInterval = null;
       }
@@ -94,65 +94,65 @@ class BreadthFirstSearchAlgorithmDemo {
   }
   
   #markDestination(event) {
-    const prevDestinationSqr = this.#destinationSquare;
-    if (prevDestinationSqr) {
-      prevDestinationSqr.classList.remove('square--selected');
-      prevDestinationSqr.dataset.weight = null;
+    const prevDestinationCell = this.#destinationCell;
+    if (prevDestinationCell) {
+      prevDestinationCell.classList.remove('cell--selected');
+      prevDestinationCell.dataset.weight = null;
     }
     
     this.#clearBoard();
-    const square = event.currentTarget;
-    square.classList.add('square--selected');
-    this.#destinationSquare = square;
-    square.dataset.weight = 0;
+    const cell = event.currentTarget;
+    cell.classList.add('cell--selected');
+    this.#destinationCell = cell;
+    cell.dataset.weight = 0;
     
-    this.#propagateWeight(square);
+    this.#propagateWeight(cell);
     this.#moveGhost();
   }
   
   #createBoard(size = 'board--12x12') {
     this.#board.classList.add(size);
 
-    this.#squareProps.forEach((column) => {
+    this.#cellProps.forEach((column) => {
       column.forEach(({ enabled, index }) => {
-        const square = document.createElement('div');
-        square.classList.add('square', 'square--with-border');
-        square.id = `square-${index}`;
+        const cell = document.createElement('div');
+        cell.classList.add('cell', 'cell--with-border');
+        cell.id = `cell-${index}`;
         
         if (enabled) {
-          square.dataset.weight = '';
-          square.classList.add('square--enabled', 'square--show-weight');
-          square.addEventListener('click', this.#markDestination.bind(this));
+          cell.dataset.weight = '';
+          cell.classList.add('cell--enabled', 'cell--show-weight');
+          cell.addEventListener('click', this.#markDestination.bind(this));
         }
         
-        this.#board.appendChild(square);
+        this.#board.appendChild(cell);
       });
     });
   }
   
   #setOptions() {
     const showHideProps = (checkbox, className) => {
-      this.#board.childNodes.forEach((sqr) => {
+      this.#board.childNodes.forEach((cell) => {
         if (checkbox.checked) {
-          sqr.classList.add(className);
+          cell.classList.add(className);
         } else {
-          sqr.classList.remove(className);
+          cell.classList.remove(className);
         }
       });
     }
 
     const showBorders = document.getElementById('show-borders');
-    showBorders.addEventListener('change', () => showHideProps(showBorders, 'square--with-border'));
+    showBorders.addEventListener('change', () => showHideProps(showBorders, 'cell--with-border'));
     
     const showWeights = document.getElementById('show-weight');
-    showWeights.addEventListener('change', () => showHideProps(showWeights, 'square--show-weight'));
+    showWeights.addEventListener('change', () => showHideProps(showWeights, 'cell--show-weight'));
   }
 
   start() {
     this.#createBoard();
     this.#setOptions();
     
-    const initialGhostPos = document.getElementById(`square-${18}`);
+    const initialGhostPos = document.getElementById(`cell-${18}`);
     initialGhostPos.appendChild(this.#ghost);
   }
 }

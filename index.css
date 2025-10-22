@@ -72,7 +72,7 @@ input {
   box-shadow: 8px 8px 0px 3px rgba(0, 0, 0, 1);
 }
 
-.square {
+.cell {
   position: relative;
   box-sizing: border-box;
   width: 64px;
@@ -84,27 +84,27 @@ input {
   justify-content: center;
 }
 
-.square--with-border {
+.cell--with-border {
   border: 1px solid #000;
 }
 
-.square:hover {
+.cell:hover {
   cursor: not-allowed;
 }
 
-.square--enabled {
+.cell--enabled {
   background-color: #fff;
 }
 
-.square--show-weight::after {
-  content: attr(data-weight);
-}
-
-.square--enabled:hover {
+.cell--enabled:hover {
   cursor: pointer;
 }
 
-.square--selected {
+.cell--show-weight::after {
+  content: attr(data-weight);
+}
+
+.cell--selected {
   background-color: #5ab95a;
 }
 
