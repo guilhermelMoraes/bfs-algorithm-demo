@@ -47,7 +47,7 @@ class BreadthFirstSearchAlgorithmDemo {
   
   #propagateWeight(refSquare) {
     const queue = [{ square: refSquare, distance: 0 }];
-    
+
     while (queue.length > 0) {
       const { square, distance } = queue.shift();
       
